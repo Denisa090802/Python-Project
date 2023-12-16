@@ -277,36 +277,42 @@ class MAIN:
         alert_surface = alert_font.render(message, True, (255, 255, 255))
         alert_rect = alert_surface.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2))
 
-
         alert_bg_rect = pygame.Rect(alert_rect.left - 10, alert_rect.top - 10, alert_rect.width + 20, alert_rect.height + 20)
         pygame.draw.rect(screen, alert_background, alert_bg_rect)
         pygame.draw.rect(screen, border_color, alert_bg_rect, 2)
 
         pygame.draw.rect(screen, (255, 0, 0), alert_rect)
         screen.blit(alert_surface, alert_rect)
+
+        # Adaugă textul "Press Enter to play again" sub mesajul original
+        play_again_text = alert_font.render("Press Enter to play again", True, (255, 255, 255))
+        play_again_rect = play_again_text.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2 + alert_rect.height // 2 + 30))
+        screen.blit(play_again_text, play_again_rect)
+
+        play_again_text = alert_font.render("Press CEVA RANDOM", True, (255, 255, 255))
+        play_again_rect = play_again_text.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2 + alert_rect.height // 2 + 60))
+        screen.blit(play_again_text, play_again_rect)
+
         pygame.display.flip()
-      
-        
-        #pygame.time.delay(5000)  # Pause for 2 seconds  asta blocheaza tot
-       
+
         wait_for_key = True
         while wait_for_key:
             for event in pygame.event.get():
-             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-               
-             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-               
-                wait_for_key = False
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    start_level_selection()
+                    wait_for_key = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    start_game(self.level)
+                    wait_for_key = False
 
-             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                start_game(self.level)
-                wait_for_key = False 
-
-    # Clear the screen after pressing Enter
+        # Clear the screen after pressing Enter
         screen.fill((175, 215, 70))
         pygame.display.flip()
+
+
     
     def display_game_message(message, position, font_size=20, font_color=(255, 255, 255)):
         font = pygame.font.Font(None, font_size)
@@ -386,38 +392,78 @@ screen_size = (cell_number * cell_size, cell_number * cell_size)  # Define scree
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+button_width = (screen_size[0] // 4)
+button_height = (screen_size[1] // 8)
+button_spacing = button_height // 6
+button_color = (230,0,0)
+button_text_color = (255,255,255)
 
 
 # Function to get the user's level choice
 def get_user_level():
-    levels = ["Easy", "Medium", "Hard"]
+    levels = ["Easy", "Medium", "Hard", "Exit"]
     selected_level = None
+
+    buttons = get_buttons_rect(levels)
 
     while selected_level is None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    selected_level = "Easy"
-                elif event.key == pygame.K_2:
-                    selected_level = "Medium"
-                elif event.key == pygame.K_3:
-                    selected_level = "Hard"
-
-        # Display level selection text
-        screen.fill((175, 215, 70))
-        level_text = game_font.render("Select Level:", True, (56, 74, 12))
-        screen.blit(level_text, (screen_size[0] // 2 - 100, screen_size[1] // 2 - 50))
-        for i, level in enumerate(levels, start=1):
-            level_text = game_font.render(f"{i}. {level}", True, (56, 74, 12))
-            screen.blit(level_text, (screen_size[0] // 2 - 100, screen_size[1] // 2 + i * 30))
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for button_rect, text in buttons:
+                    if button_rect.collidepoint(event.pos):
+                        if text == "Exit":
+                            selected_level = text
+                            # print(text)
+                            pygame.quit()
+                            sys.exit()
+                        else:
+                            selected_level = text
+                            # pygame.quit()
+                            
+        screen.fill((175,215,70))
+        # button_text = game_font.render("Select Level:", True, (56, 74, 12))
+        # screen.blit(button_text, (screen_size[0] // 2 - 100, screen_size[1] // 2 - 50))
+        # for i, level in enumerate(levels, start=1):
+        #     button_text = game_font.render(f"{i}. {level}", True, (56, 74, 12))
+        #     screen.blit(button_text, (screen_size[0] // 2 - 100, screen_size[1] // 2 + i * 30))
+        draw_buttons(buttons)
 
         pygame.display.update()
         clock.tick(60)
 
     return selected_level
+
+def get_buttons_rect(levels):
+    buttons = []
+    for i, text in enumerate(levels):
+        button_rect = pygame.Rect(
+            (screen_size[0] - button_width) // 2,
+            (screen_size[1] - (button_height + button_spacing) * len(levels)) // 2 + i * (button_height + button_spacing),
+            button_width,
+            button_height
+        )
+        buttons.append((button_rect, text))
+    return buttons
+
+def draw_buttons(buttons):
+    font_size = int(0.70 * button_height)  # Calculează dimensiunea fontului pe baza înălțimii butonului
+    font = pygame.font.Font(None, font_size)
+    
+    for button_rect, text in buttons:
+        pygame.draw.rect(screen, button_color, button_rect, border_radius=15)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect, border_radius=15, width=3)
+        
+        button_text = font.render(text, True, button_text_color)
+        
+        # Ajustează poziția textului pentru a fi în centrul butonului
+        text_x = button_rect.centerx - button_text.get_width() // 2
+        text_y = button_rect.centery - button_text.get_height() // 2
+        screen.blit(button_text, (text_x, text_y))
+
+
 
 
 fruit = FRUIT(0)

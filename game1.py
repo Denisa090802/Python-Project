@@ -188,7 +188,7 @@ class OBSTACLE:
             x = int(obstacle.x * cell_size)
             y = int(obstacle.y * cell_size)
             obstacle_rect = pygame.Rect(x, y, cell_size, cell_size)
-            pygame.draw.rect(screen, (255, 0, 0), obstacle_rect)
+            pygame.draw.rect(screen, (98,60,15), obstacle_rect)
 
 # Clasa principala  
 class MAIN:
@@ -207,7 +207,7 @@ class MAIN:
         self.check_collision()
         self.check_fail()
 
-    # desenarea tuturor elementelor care constituie tabla de joc
+    # desenarea tuturor elementelor care constituie tabla de joc prin apelarea functiilor corespunzatoare
     def draw_elements(self):
         self.draw_grass()
         self.fruit.draw_fruit()
@@ -257,7 +257,8 @@ class MAIN:
 
         # verifica daca sarpele se loveste de el insusi
         for block in self.snake.body[1:]:
-            if block == self.snake.body[0]:
+             if block == self.snake.body[0]:
+                # self.show_alert("Game Over", f"You lost!   Your score: {current_score}    Best score: {best_score}")
                 self.game_over()
          
         # adaugarea progresiva a obstacolelor => pe masura ce se avanseaza in scor, pe ecran apar mai multe obstacole
@@ -270,9 +271,9 @@ class MAIN:
 
     # Afisarea regulilor la finalul jocului   
     def show_alert(self, title, message):
-        alert_background = (255, 0, 0)
+        alert_background = (169,16,16)
         border_color = (0, 0, 0)
-        alert_font = pygame.font.Font(None,table_width * 2)
+        alert_font = pygame.font.Font('Font/AuraSeraphRegular-own3z.ttf',table_width * 2)
         alert_surface = alert_font.render(message, True, (255, 255, 255))
         alert_rect = alert_surface.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2))
 
@@ -280,14 +281,14 @@ class MAIN:
         pygame.draw.rect(screen, alert_background, alert_bg_rect)
         pygame.draw.rect(screen, border_color, alert_bg_rect, 2)
 
-        pygame.draw.rect(screen, (255, 0, 0), alert_rect)
+        pygame.draw.rect(screen, (169,16,16), alert_rect)
         screen.blit(alert_surface, alert_rect)
 
-        play_again_text = alert_font.render("Press Space to play again", True, (255, 255, 255))
+        play_again_text = alert_font.render("Press Space to play again", True, (56,74,12))
         play_again_rect = play_again_text.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2 + alert_rect.height // 2 + 30))
         screen.blit(play_again_text, play_again_rect)
 
-        play_again_text = alert_font.render("Press Enter to select another level", True, (255, 255, 255))
+        play_again_text = alert_font.render("Press Enter to select another level", True, (56,74,12))
         play_again_rect = play_again_text.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2 + alert_rect.height // 2 + 60))
         screen.blit(play_again_text, play_again_rect)
 
@@ -308,7 +309,7 @@ class MAIN:
                     wait_for_key = False
 
         # curatarea ecranului
-        screen.fill((175, 215, 70))
+        screen.fill((193,169,142))
         pygame.display.flip()
 
     def game_over(self):
@@ -316,7 +317,7 @@ class MAIN:
    
     # Desenarea ierbii (tabla de joc)
     def draw_grass(self):
-        grass_color = (167,209,61)
+        grass_color = (201,178,153)
         for row in range(cell_number):
             if row % 2 == 0:
                 for col in range(cell_number):
@@ -346,7 +347,7 @@ class MAIN:
         apple_rect = apple.get_rect(midright = (score_rect.left, score_rect.centery))
         bg_rect = pygame.Rect(apple_rect.left,apple_rect.top,apple_rect.width + score_rect.width+ 6 ,apple_rect.height)
 
-        pygame.draw.rect(screen,(167,209,61),bg_rect)
+        pygame.draw.rect(screen,(193,169,142),bg_rect)
         screen.blit(score_surface,score_rect)
         screen.blit(high_score_surface, high_score_rect)
         screen.blit(apple,apple_rect)
@@ -360,11 +361,11 @@ screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_si
 screen_size = (cell_number * cell_size, cell_number * cell_size)  # Define screen_size
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
-game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+game_font = pygame.font.Font('Font/AuraSeraphRegular-own3z.ttf', 25)
 button_width = (screen_size[0] // 4)
 button_height = (screen_size[1] // 8)
 button_spacing = button_height // 6
-button_color = (230,0,0)
+button_color = (169,16,16)
 button_text_color = (255,255,255)
 
 
@@ -372,6 +373,8 @@ button_text_color = (255,255,255)
 def get_user_level():
     levels = ["Easy", "Medium", "Hard", "Exit"]
     selected_level = None
+
+    
 
     buttons = get_buttons_rect(levels)
 
@@ -392,7 +395,20 @@ def get_user_level():
                             selected_level = text
                             # pygame.quit()
                             
-        screen.fill((175,215,70))
+        screen.fill((193,169,142))
+
+        # titlul jocului
+        game_name_font = pygame.font.Font('Font/Arthemis-PKY27.ttf', 70)
+        game_name_text = game_name_font.render("Snake Game", True, (0, 0, 0))
+        game_name_rect = game_name_text.get_rect()
+        game_name_rect.centerx = screen_size[0] // 2
+        game_name_rect.y = 40
+
+        # Desenează textul pe ecran
+        screen.blit(game_name_text, game_name_rect)
+
+
+
         draw_buttons(buttons)
 
         pygame.display.update()
@@ -415,7 +431,7 @@ def get_buttons_rect(levels):
 
 def draw_buttons(buttons):
     font_size = int(0.70 * button_height)  # Calculează dimensiunea fontului pe baza inaltimii butonului
-    font = pygame.font.Font(None, font_size)
+    font = pygame.font.Font('Font/AuraSeraphRegular-own3z.ttf', font_size)
     
     for button_rect, text in buttons:
         pygame.draw.rect(screen, button_color, button_rect, border_radius=15)
@@ -476,7 +492,7 @@ def start_game(selected_level):
                 if event.key == pygame.K_RIGHT:
                     if (main_game.snake.direction.x != -1):
                         main_game.snake.direction = Vector2(1, 0)
-        screen.fill((175,215,70))
+        screen.fill((193,169,142))
         main_game.draw_elements()
         pygame.display.update()
         clock.tick(90)
